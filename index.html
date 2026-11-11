@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
+<head><!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -26,31 +28,22 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<!-- Firebase Realtime Database (compat SDK) -->
+<!-- Firebase SDKs (Auth, App, Database) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
 
 <style type="text/tailwindcss">
   @layer components {
     .card { @apply bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl min-w-0; }
-    .btn { @apply inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-semibold bg-brand-700 text-white hover:bg-brand-600 transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500; }
+    .btn { @apply inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-semibold bg-brand-700 text-white hover:bg-brand-600 transition-colors whitespace-nowrap; }
     .btn-ghost { @apply bg-transparent text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800; }
     .inp { @apply w-full min-w-0 px-3 py-2 rounded-lg text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500; }
     .th { @apply text-left px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap; }
     .td { @apply px-4 py-3 text-sm align-middle border-t border-slate-100 dark:border-slate-800 whitespace-nowrap; }
     .badge { @apply inline-block px-2 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap; }
-    .lnk { @apply text-xs font-semibold hover:underline; }
   }
   body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
-  .tab-in { animation: fadeUp .18s ease-out; }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-  @media (prefers-reduced-motion: reduce) { .tab-in { animation: none; } }
-
-  #printArea { display: none; }
-  @media print {
-    body > *:not(#printArea) { display: none !important; }
-    #printArea { display: block !important; background: #fff; color: #111; }
-  }
 </style>
 </head>
 
@@ -60,108 +53,88 @@
 <div id="boot" class="fixed inset-0 z-[80] grid place-items-center bg-slate-50 dark:bg-slate-950">
   <div class="text-center">
     <div class="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-    <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">Connecting to database…</p>
+    <p class="mt-4 text-sm text-slate-500">Loading BizDesk OS…</p>
   </div>
 </div>
 
+<!-- Google Login Screen (Hidden if logged in) -->
+<div id="loginScreen" class="fixed inset-0 z-[75] hidden grid place-items-center bg-slate-900/80 p-4">
+  <div class="card max-w-md w-full p-8 text-center shadow-2xl bg-white dark:bg-slate-900">
+    <div class="w-12 h-12 rounded-xl bg-brand-700 text-white grid place-items-center font-extrabold text-xl mx-auto mb-4">B</div>
+    <h2 class="text-2xl font-extrabold mb-2">Welcome to BizDesk</h2>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Sign in with your Google account to access your business operating system.</p>
+    <button onclick="loginWithGoogle()" class="btn w-full py-3 gap-3 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 dark:bg-slate-800 dark:text-white dark:border-slate-700 font-bold">
+      <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.16 21.32 7.22 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.83 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.22 0 3.16 2.68 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
+      Sign in with Google
+    </button>
+  </div>
+</div>
+
+<!-- Main App Layout -->
 <div class="flex min-h-screen">
   <aside class="hidden lg:flex w-60 shrink-0 flex-col sticky top-0 h-screen border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
     <div id="brand" class="px-5 py-5 flex items-center gap-2.5 min-w-0"></div>
-    <nav id="sideNav" class="flex-1 px-3 space-y-1 overflow-y-auto" aria-label="Main"></nav>
-    <div id="sideFoot" class="p-4 text-xs text-slate-500 dark:text-slate-400"></div>
+    <nav id="sideNav" class="flex-1 px-3 space-y-1 overflow-y-auto"></nav>
   </aside>
 
   <div class="flex-1 min-w-0 flex flex-col">
     <header class="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800">
       <div class="flex items-center justify-between gap-3 px-4 sm:px-6 h-14">
-        <div class="flex items-center gap-2 min-w-0">
-          <span id="brandMini" class="lg:hidden shrink-0"></span>
-          <h1 id="pageTitle" class="font-bold text-lg truncate min-w-0"></h1>
-        </div>
-        <div class="flex items-center gap-2 shrink-0">
-          <span id="syncPill" class="badge"></span>
-          <button onclick="openSetup(false)" class="btn btn-ghost" aria-label="Business profile">⚙<span class="hidden sm:inline">Profile</span></button>
-          <button id="themeBtn" onclick="toggleTheme()" class="btn btn-ghost" aria-label="Switch mode">
-            <span id="themeIcon" aria-hidden="true"></span><span id="themeTxt" class="hidden sm:inline"></span>
-          </button>
+        <h1 id="pageTitle" class="font-bold text-lg truncate">Dashboard</h1>
+        <div class="flex items-center gap-2">
+          <button onclick="openSetup()" class="btn btn-ghost">⚙ Profile</button>
+          <button onclick="logout()" class="btn btn-ghost text-rose-600">Logout</button>
         </div>
       </div>
-      <nav id="topNav" class="lg:hidden flex gap-1.5 overflow-x-auto px-3 pb-2.5" aria-label="Sections"></nav>
     </header>
     <main id="view" class="p-4 sm:p-6 w-full max-w-7xl mx-auto min-w-0"></main>
   </div>
 </div>
 
-<!-- Business Setup Modal -->
+<!-- Business Setup / Profile Modal with Logo & Currency -->
 <div id="setup" class="fixed inset-0 z-[70] hidden items-center justify-center bg-slate-900/70 p-4">
-  <form id="sForm" class="card w-full max-w-lg max-h-[94vh] overflow-y-auto p-5 sm:p-6 shadow-2xl">
-    <div class="flex items-start justify-between gap-3 mb-1">
-      <div class="min-w-0">
-        <h2 id="sTitle" class="font-extrabold text-xl">Set up your business</h2>
-        <p id="sSub" class="text-sm text-slate-500 dark:text-slate-400 mt-1">This appears on your invoices, receipts and reports.</p>
-      </div>
-      <button type="button" id="sClose" onclick="closeSetup()" class="text-slate-500 text-2xl leading-none hidden" aria-label="Close">×</button>
-    </div>
-    <div class="space-y-3 mt-4">
-      <label class="block"><span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Business name</span>
-        <input id="sName" class="inp mt-1" required maxlength="80" placeholder="e.g. Rahman Fashion House"></label>
+  <form id="sForm" class="card w-full max-w-lg p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+    <h2 class="font-extrabold text-xl mb-4">Business Profile & Settings</h2>
+    <div class="space-y-3">
+      <label class="block text-xs font-semibold text-slate-500">Business name
+        <input id="sName" class="inp mt-1" required placeholder="e.g. Rahman Fashion House"></label>
       <div class="grid sm:grid-cols-2 gap-3">
-        <label class="block"><span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Phone</span>
-          <input id="sPhone" type="tel" class="inp mt-1" required maxlength="30" placeholder="01XXX-XXXXXX"></label>
-        <label class="block"><span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Currency</span>
-          <select id="sCur" class="inp mt-1"></select></label>
+        <label class="block text-xs font-semibold text-slate-500">Phone
+          <input id="sPhone" type="tel" class="inp mt-1" required placeholder="01XXX-XXXXXX"></label>
+        <label class="block text-xs font-semibold text-slate-500">Currency
+          <select id="sCur" class="inp mt-1">
+            <option value="৳">৳ (BDT)</option>
+            <option value="$">$ (USD)</option>
+            <option value="₹">₹ (INR)</option>
+            <option value="€">€ (EUR)</option>
+            <option value="£">£ (GBP)</option>
+            <option value="SAR">SAR</option>
+            <option value="AED">AED</option>
+          </select></label>
       </div>
-      <label class="block"><span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Address</span>
-        <textarea id="sAddr" rows="2" class="inp mt-1" maxlength="200" placeholder="Shop address"></textarea></label>
-      <label class="block"><span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Google Sheets Web App URL <span class="font-normal">(optional backup)</span></span>
-        <input id="sSheet" type="url" class="inp mt-1" maxlength="500" inputmode="url" autocomplete="off" placeholder="https://script.google.com/macros/s/…/exec">
-        <span class="block mt-1 text-[11px] text-slate-500 dark:text-slate-400">New, edited and delivered orders are sent here in the background. Leave empty to disable.</span></label>
+      <label class="block text-xs font-semibold text-slate-500">Address
+        <textarea id="sAddr" rows="2" class="inp mt-1" placeholder="Shop address"></textarea></label>
+      <label class="block text-xs font-semibold text-slate-500">Google Sheets Web App URL (Optional Backup)
+        <input id="sSheet" type="url" class="inp mt-1" placeholder="https://script.google.com/macros/s/.../exec"></label>
       <div>
-        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Logo</span>
+        <span class="text-xs font-semibold text-slate-500">Logo URL or Upload</span>
         <div class="flex items-center gap-3 mt-1">
-          <div class="w-16 h-16 shrink-0 rounded-lg border border-dashed border-slate-300 dark:border-slate-700 grid place-items-center overflow-hidden bg-white dark:bg-slate-800">
+          <div class="w-14 h-14 shrink-0 rounded-lg border border-dashed grid place-items-center overflow-hidden bg-slate-50">
             <img id="sPrev" alt="" class="max-w-full max-h-full object-contain hidden">
-            <span id="sPrevEmpty" class="text-xs text-slate-400">No logo</span>
+            <span id="sPrevEmpty" class="text-[10px] text-slate-400">No logo</span>
           </div>
-          <div class="flex-1 min-w-0 space-y-2">
-            <input id="sLogoUrl" class="inp" placeholder="Paste logo link (https://…)" inputmode="url">
-            <div class="flex items-center gap-2 flex-wrap">
-              <label class="btn btn-ghost !py-1.5 !text-xs cursor-pointer">Upload image
-                <input id="sLogoFile" type="file" accept="image/*" class="hidden"></label>
-              <button type="button" id="sLogoClear" class="lnk text-rose-600 dark:text-rose-400">Remove</button>
-            </div>
-          </div>
+          <input id="sLogoUrl" class="inp" placeholder="Paste logo image link (https://...)" oninput="updateLogo(this.value)">
         </div>
       </div>
     </div>
     <div class="flex gap-2 justify-end mt-6">
-      <button type="button" id="sCancel" class="btn btn-ghost hidden" onclick="closeSetup()">Cancel</button>
-      <button type="submit" class="btn">Save business profile</button>
+      <button type="button" class="btn btn-ghost" onclick="closeSetup()">Cancel</button>
+      <button type="submit" class="btn">Save Profile</button>
     </div>
   </form>
 </div>
-
-<!-- Modal Form -->
-<div id="modal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-slate-900/60 p-0 sm:p-4" onclick="if(event.target===this)closeModal()">
-  <form id="mForm" class="card w-full sm:max-w-md max-h-[92vh] overflow-y-auto p-5 rounded-b-none sm:rounded-b-xl shadow-2xl">
-    <div class="flex justify-between items-start gap-3 mb-4">
-      <h2 id="mTitle" class="font-bold text-lg break-words min-w-0"></h2>
-      <button type="button" onclick="closeModal()" class="text-slate-500 text-2xl leading-none" aria-label="Close">×</button>
-    </div>
-    <div id="mFields" class="space-y-3"></div>
-    <div id="mWarn" class="mt-3"></div>
-    <div class="flex gap-2 justify-end mt-5">
-      <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-      <button id="mSave" type="submit" class="btn">Save</button>
-    </div>
-  </form>
-</div>
-
-<div id="toast" role="status" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[90] hidden max-w-[90vw] px-4 py-2 rounded-lg text-sm font-semibold shadow-lg"></div>
-<div id="printArea" aria-hidden="true"></div>
 
 <script>
-/* FIREBASE CONFIGURATION */
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyA-_LY_H2WEosUXlNXXsN--IzhdBvXl2ts",
   authDomain: "bizdesk-app.firebaseapp.com",
@@ -173,118 +146,71 @@ const FIREBASE_CONFIG = {
   measurementId: "G-LQ35H1DK9E"
 };
 
-const DB = (() => {
-  try {
-    if (!window.firebase || !FIREBASE_CONFIG.apiKey) return null;
-    firebase.initializeApp(FIREBASE_CONFIG);
-    return firebase.database();
-  } catch (e) { console.error('Firebase init failed', e); return null; }
-})();
+let DB, AUTH;
+try {
+  firebase.initializeApp(FIREBASE_CONFIG);
+  DB = firebase.database();
+  AUTH = firebase.auth();
+} catch(
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BizDesk – Business Operating System</title>
+<meta name="theme-color" content="#0f766e">
 
-/* HELPERS & DATA MANAGEMENT */
-const $ = s => document.querySelector(s);
-const pad = n => String(n).padStart(2, '0');
-const iso = (offset = 0) => {
-  const d = new Date(); d.setDate(d.getDate() + offset);
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-};
-
-const CUR = () => (S.profile && S.profile.currency) || '৳';
-const money = n => (n < 0 ? '−' : '') + CUR() + Math.abs(Math.round(n || 0)).toLocaleString('en-US');
-const uid = () => Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-5);
-const last10 = p => String(p || '').replace(/\D/g, '').slice(-10);
-
-const KEY = 'bizdesk_data_v1';
-const COLS = ['orders', 'products', 'employees', 'advances', 'posts', 'ledger', 'blacklist'];
-
-function emptyData() {
-  return { profile: null, orders: [], products: [], employees: [], advances: [], posts: [], ledger: [], blacklist: [] };
-}
-
-let S = emptyData();
-let LOADED = false;
-
-function persist() {
-  if (!DB || !LOADED) return;
-  const up = {};
-  COLS.forEach(c => {
-    S[c].forEach((r) => {
-      up[`${c}/${r.id}`] = r;
-    });
-  });
-  if (Object.keys(up).length) DB.ref().update(up);
-}
-
-function startFirebase() {
-  COLS.forEach(c => {
-    DB.ref(c).on('value', snap => {
-      const val = snap.val() || {};
-      S[c] = Object.entries(val).map(([id, r]) => ({ ...r, id }));
-      if (LOADED) render();
-    });
-  });
-  DB.ref('settings/profile').on('value', snap => {
-    S.profile = snap.val() || null;
-    if (LOADED) render();
-    finishBoot();
-  });
-}
-
-function finishBoot() {
-  if (LOADED) return;
-  LOADED = true;
-  const b = $('#boot'); if (b) b.remove();
-  render({ anim: true });
-  if (!S.profile) openSetup(true);
-}
-
-/* GOOGLE SHEETS BACKUP */
-function backupOrder(o) {
-  const url = String((S.profile && S.profile.sheetUrl) || '').trim();
-  if (!url || !o || !/^https:\/\/\S+$/i.test(url)) return;
-  const payload = {
-    orderNo: 'ORD-' + o.no,
-    date: o.date,
-    name: o.customer,
-    phone: o.phone,
-    products: o.products,
-    total: +o.total,
-    status: o.status
-  };
-  fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) })
-    .catch(err => console.warn('Google Sheets backup error', err));
-}
-
-/* RENDER & EVENT HANDLERS */
-function render() {
-  const main = $('#view');
-  if (main) main.innerHTML = `<div class="card p-6"><h2 class="text-xl font-bold mb-2">Welcome to BizDesk OS</h2><p class="text-sm text-slate-500">System connected and live.</p></div>`;
-  $('#brand').innerHTML = `<div class="font-extrabold text-lg">${S.profile?.name || 'BizDesk'}</div>`;
-}
-
-function openSetup(req) {
-  $('#setup').classList.remove('hidden');
-  $('#setup').classList.add('flex');
-}
-function closeSetup() { $('#setup').classList.add('hidden'); $('#setup').classList.remove('flex'); }
-
-$('#sForm')?.addEventListener('submit', e => {
-  e.preventDefault();
-  const prof = {
-    name: $('#sName').value,
-    phone: $('#sPhone').value,
-    currency: $('#sCur').value || '৳',
-    address: $('#sAddr').value,
-    sheetUrl: $('#sSheet').value
-  };
-  S.profile = prof;
-  if (DB) DB.ref('settings/profile').set(prof);
-  closeSetup();
-  render();
-});
-
-if (DB) startFirebase();
-else finishBoot();
+<script>
+  (function () {
+    try { if (localStorage.getItem('bizdesk_theme') === 'dark') document.documentElement.classList.add('dark'); } catch (e) {}
+  })();
 </script>
-</body>
-</html>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: { sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'] },
+        colors: { brand: { 50: '#f0fdfa', 100: '#ccfbf1', 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e', 900: '#134e4a' } }
+      }
+    }
+  };
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Firebase SDKs (Auth, App, Database) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+
+<style type="text/tailwindcss">
+  @layer components {
+    .card { @apply bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl min-w-0; }
+    .btn { @apply inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-semibold bg-brand-700 text-white hover:bg-brand-600 transition-colors whitespace-nowrap; }
+    .btn-ghost { @apply bg-transparent text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800; }
+    .inp { @apply w-full min-w-0 px-3 py-2 rounded-lg text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500; }
+    .th { @apply text-left px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap; }
+    .td { @apply px-4 py-3 text-sm align-middle border-t border-slate-100 dark:border-slate-800 whitespace-nowrap; }
+    .badge { @apply inline-block px-2 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap; }
+  }
+  body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+</style>
+</head>
+
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 antialiased transition-colors">
+
+<!-- Boot Screen -->
+<div id="boot" class="fixed inset-0 z-[80] grid place-items-center bg-slate-50 dark:bg-slate-950">
+  <div class="text-center">
+    <div class="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+    <p class="mt-4 text-sm text-slate-500">Loading BizDesk OS…</p>
+  </div>
+</div>
+
+<!-- Google Login Screen (Hidden if logged in) -->
+<div id="loginScreen" class="fixed inset-0 z-[75] hidden grid place-items-center bg-slate-900/80 p-4">
+  <div class="card max-w-md w-full p-8 text-center shadow-2xl bg-white dark:bg-slate-900">
+    <div class="w-12 h-12 rounded-xl bg-brand-700 text-white grid place-items-center font-extrabold text-xl mx-auto mb-4">B</div>
+    <h2 class="text-2xl font-extrabold mb-2">Welcome to BizDesk</h2>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Sign in with your Google account to access your business operating system.</p>
+    <button onclick="loginWithGoogle()" class="btn w-full py-3 gap-3 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 dark:bg-slate-800 dark:text-white dark:border-slate-700 font-bold">
+      <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.16 21.32 7.22 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.83 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0
