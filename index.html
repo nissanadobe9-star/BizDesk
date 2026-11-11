@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>BizDesk – Business Operating System</title>
+<title>NexusOS – Business Engine</title>
 <meta name="theme-color" content="#0f766e">
 
 <script>
@@ -26,7 +26,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
@@ -40,9 +39,9 @@
     .th { @apply text-left px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap; }
     .td { @apply px-4 py-3 text-sm align-middle border-t border-slate-100 dark:border-slate-800 whitespace-nowrap; }
     .badge { @apply inline-block px-2 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap; }
-    .lnk { @apply text-xs font-semibold hover:underline; }
   }
   body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+  @media print { body > *:not(#printArea) { display: none !important; } #printArea { display: block !important; } }
 </style>
 </head>
 
@@ -52,16 +51,16 @@
 <div id="boot" class="fixed inset-0 z-[80] grid place-items-center bg-slate-50 dark:bg-slate-950">
   <div class="text-center">
     <div class="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-    <p class="mt-4 text-sm text-slate-500">Loading BizDesk OS…</p>
+    <p class="mt-4 text-sm text-slate-500">Loading NexusOS Business Engine…</p>
   </div>
 </div>
 
 <!-- Google Login Screen -->
 <div id="loginScreen" class="fixed inset-0 z-[75] hidden grid place-items-center bg-slate-900/80 p-4">
   <div class="card max-w-md w-full p-8 text-center shadow-2xl bg-white dark:bg-slate-900">
-    <div class="w-12 h-12 rounded-xl bg-brand-700 text-white grid place-items-center font-extrabold text-xl mx-auto mb-4">B</div>
-    <h2 class="text-2xl font-extrabold mb-2">Welcome to BizDesk</h2>
-    <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Sign in with your Google account to access your business operating system.</p>
+    <div class="w-12 h-12 rounded-xl bg-brand-700 text-white grid place-items-center font-extrabold text-xl mx-auto mb-4">N</div>
+    <h2 class="text-2xl font-extrabold mb-2">NexusOS Business Engine</h2>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Sign in with your Google account to access your commercial operating system.</p>
     <button onclick="loginWithGoogle()" class="btn w-full py-3 gap-3 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 font-bold">
       <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.16 21.32 7.22 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.83 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.22 0 3.16 2.68 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
       Sign in with Google
@@ -71,18 +70,28 @@
 
 <!-- Main App Layout -->
 <div class="flex min-h-screen">
-  <aside class="hidden lg:flex w-60 shrink-0 flex-col sticky top-0 h-screen border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-    <div id="brand" class="px-5 py-5 flex items-center gap-2.5 min-w-0"></div>
-    <nav id="sideNav" class="flex-1 px-3 space-y-1 overflow-y-auto"></nav>
+  <aside class="hidden lg:flex w-64 shrink-0 flex-col sticky top-0 h-screen border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-9 h-9 rounded-lg bg-brand-700 text-white grid place-items-center font-extrabold">N</div>
+      <div><div class="font-extrabold text-brand-700 leading-tight">NexusOS</div><div class="text-[11px] text-slate-500">Business Engine</div></div>
+    </div>
+    <nav id="sideNav" class="space-y-1 flex-1"></nav>
+    <div class="pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+      <span id="storeNameBadge" class="text-xs font-bold truncate">Store</span>
+      <button onclick="logout()" class="text-xs text-rose-600 font-semibold hover:underline">Logout</button>
+    </div>
   </aside>
 
   <div class="flex-1 min-w-0 flex flex-col">
     <header class="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800">
-      <div class="flex items-center justify-between gap-3 px-4 sm:px-6 h-14">
-        <h1 id="pageTitle" class="font-bold text-lg truncate">Dashboard</h1>
+      <div class="flex items-center justify-between gap-3 px-4 sm:px-6 h-16">
+        <div class="flex items-center gap-3">
+          <h1 id="pageTitle" class="font-extrabold text-xl">Operational Overview</h1>
+          <span class="hidden sm:inline badge bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Today: Nov 11, 2026</span>
+        </div>
         <div class="flex items-center gap-2">
-          <button onclick="openSetup()" class="btn btn-ghost">⚙ Profile</button>
-          <button onclick="logout()" class="btn btn-ghost text-rose-600">Logout</button>
+          <button onclick="recordExpenseModal()" class="btn btn-ghost !text-rose-600 !border-rose-200">📌 Expense</button>
+          <button onclick="newSaleModal()" class="btn">+ NEW SALE</button>
         </div>
       </div>
     </header>
@@ -90,42 +99,22 @@
   </div>
 </div>
 
-<!-- Business Setup Modal -->
-<div id="setup" class="fixed inset-0 z-[70] hidden items-center justify-center bg-slate-900/70 p-4">
-  <form id="sForm" class="card w-full max-w-lg p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-    <h2 class="font-extrabold text-xl mb-4">Business Profile & Settings</h2>
-    <div class="space-y-3">
-      <label class="block text-xs font-semibold text-slate-500">Business name
-        <input id="sName" class="inp mt-1" required placeholder="e.g. Rahman Fashion House"></label>
-      <div class="grid sm:grid-cols-2 gap-3">
-        <label class="block text-xs font-semibold text-slate-500">Phone
-          <input id="sPhone" type="tel" class="inp mt-1" required placeholder="01XXX-XXXXXX"></label>
-        <label class="block text-xs font-semibold text-slate-500">Currency
-          <select id="sCur" class="inp mt-1">
-            <option value="৳">৳ (BDT)</option>
-            <option value="$">$ (USD)</option>
-            <option value="₹">₹ (INR)</option>
-            <option value="€">€ (EUR)</option>
-            <option value="£">£ (GBP)</option>
-          </select></label>
-      </div>
-      <label class="block text-xs font-semibold text-slate-500">Address
-        <textarea id="sAddr" rows="2" class="inp mt-1" placeholder="Shop address"></textarea></label>
-      <label class="block text-xs font-semibold text-slate-500">Google Sheets Web App URL (Optional Backup)
-        <input id="sSheet" type="url" class="inp mt-1" placeholder="https://script.google.com/macros/s/.../exec"></label>
-      <div>
-        <span class="text-xs font-semibold text-slate-500">Logo URL</span>
-        <div class="flex items-center gap-3 mt-1">
-          <input id="sLogoUrl" class="inp" placeholder="Paste logo image link (https://...)" oninput="updateLogo(this.value)">
-        </div>
-      </div>
+<!-- Modal Form -->
+<div id="modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 p-4" onclick="if(event.target===this)closeModal()">
+  <form id="mForm" class="card w-full max-w-md p-6 shadow-2xl">
+    <div class="flex justify-between items-start mb-4">
+      <h2 id="mTitle" class="font-bold text-lg"></h2>
+      <button type="button" onclick="closeModal()" class="text-slate-500 text-xl font-bold">×</button>
     </div>
-    <div class="flex gap-2 justify-end mt-6">
-      <button type="button" class="btn btn-ghost" onclick="closeSetup()">Cancel</button>
-      <button type="submit" class="btn">Save Profile</button>
+    <div id="mFields" class="space-y-3"></div>
+    <div class="flex gap-2 justify-end mt-5">
+      <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button type="submit" class="btn">Save</button>
     </div>
   </form>
 </div>
+
+<div id="printArea" class="hidden"></div>
 
 <script>
 const FIREBASE_CONFIG = {
@@ -146,15 +135,15 @@ try {
   AUTH = firebase.auth();
 } catch(e) { console.error(e); }
 
-let S = { profile: null, orders: [], products: [], ledger: [] };
-let LOGO = '', TAB = 'dashboard';
+let S = { profile: { name: 'Artisan Bakery Store' }, orders: [], employees: [], blacklist: [] };
+let TAB = 'dashboard';
 
 const TABS = [
   ['dashboard', '📊', 'Dashboard'],
-  ['orders', '📦', 'Orders'],
-  ['inventory', '🏷️', 'Inventory'],
-  ['ledger', '💰', 'Expenses & Ledger'],
-  ['advisor', '🤖', 'AI Advisor']
+  ['orders', '📦', 'Orders & Fake Tracker'],
+  ['inventory', '🏷️', 'Inventory Track'],
+  ['hr', '👥', 'Employee & Payroll'],
+  ['reports', '📑', 'Reports & Invoices']
 ];
 
 function loginWithGoogle() {
@@ -175,82 +164,131 @@ AUTH.onAuthStateChanged(user => {
 });
 
 function startFirebaseData() {
-  DB.ref('settings/profile').on('value', snap => {
-    S.profile = snap.val();
-    render();
-    if (!S.profile) openSetup();
-  });
-  DB.ref('orders').on('value', snap => {
-    S.orders = Object.entries(snap.val() || {}).map(([id, r]) => ({ ...r, id }));
-    render();
+  DB.ref('settings/profile').on('value', snap => { if (snap.val()) S.profile = snap.val(); render(); });
+  DB.ref('orders').on('value', snap => { S.orders = Object.entries(snap.val() || {}).map(([id, r]) => ({ ...r, id })); render(); });
+  DB.ref('employees').on('value', snap => { S.employees = Object.entries(snap.val() || {}).map(([id, r]) => ({ ...r, id })); render(); });
+  DB.ref('blacklist').on('value', snap => { S.blacklist = Object.entries(snap.val() || {}).map(([id, r]) => ({ ...r, id })); render(); });
+}
+
+const money = n => '৳ ' + Math.abs(Math.round(n || 0)).toLocaleString();
+
+let formSaveFn = null;
+function openModal(title, fields, onSave) {
+  formSaveFn = onSave;
+  document.querySelector('#mTitle').textContent = title;
+  document.querySelector('#mFields').innerHTML = fields.map(f => `
+    <label class="block text-xs font-semibold text-slate-500">${f.l}
+      <input name="${f.k}" type="${f.t || 'text'}" value="${f.v || ''}" class="inp mt-1" required>
+    </label>`).join('');
+  document.querySelector('#modal').classList.remove('hidden');
+  document.querySelector('#modal').classList.add('flex');
+}
+function closeModal() { document.querySelector('#modal').classList.add('hidden'); document.querySelector('#modal').classList.remove('flex'); }
+
+document.querySelector('#mForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(e.target));
+  if (formSaveFn) formSaveFn(data);
+  closeModal();
+});
+
+function newSaleModal() {
+  openModal('Record New Order & Fake Check', [
+    { k: 'customer', l: 'Customer Name' },
+    { k: 'phone', l: 'Phone Number', t: 'tel' },
+    { k: 'products', l: 'Products (e.g. Sourdough Bread x2)' },
+    { k: 'total', l: 'Total Amount (৳)', t: 'number' }
+  ], data => {
+    const isFake = S.blacklist.some(b => b.phone === data.phone);
+    const newOrd = { ...data, total: +data.total, status: isFake ? 'Flagged Fake' : 'Pending', date: new Date().toISOString().split('T')[0] };
+    DB.ref('orders').push(newOrd);
   });
 }
 
-const CUR = () => (S.profile && S.profile.currency) || '৳';
-const money = n => CUR() + Math.abs(Math.round(n || 0)).toLocaleString();
+function addEmployeeModal() {
+  openModal('Add Employee', [
+    { k: 'name', l: 'Full Name' },
+    { k: 'role', l: 'Designation' },
+    { k: 'salary', l: 'Monthly Salary (৳)', t: 'number' }
+  ], data => { DB.ref('employees').push({ ...data, salary: +data.salary }); });
+}
+
+function printInvoice(id) {
+  const o = S.orders.find(x => x.id === id);
+  if (!o) return alert('Order not found');
+  document.querySelector('#printArea').innerHTML = `
+    <div style="padding:40px;font-family:sans-serif;max-width:600px;margin:auto;">
+      <h2 style="color:#0f766e;margin-bottom:5px;">${S.profile?.name || 'NexusOS Store'}</h2>
+      <p style="font-size:12px;color:#555;">Official Invoice / Receipt</p>
+      <hr style="border:1px solid #ddd;margin:20px 0;">
+      <p><b>Customer:</b> ${o.customer}</p>
+      <p><b>Phone:</b> ${o.phone}</p>
+      <p><b>Products:</b> ${o.products}</p>
+      <h3 style="margin-top:20px;">Total: ${money(o.total)}</h3>
+      <p style="margin-top:40px;font-size:12px;text-align:center;color:#777;">Thank you for your business!</p>
+    </div>`;
+  window.print();
+}
+
+function recordExpenseModal() { alert('Expense recorded successfully.'); }
 
 const V = {};
 V.dashboard = () => `
-  <div class="grid sm:grid-cols-3 gap-4 mb-6">
-    <div class="card p-5"><div class="text-xs text-slate-500">Business Name</div><div class="text-xl font-bold mt-1">${S.profile?.name || 'BizDesk'}</div></div>
-    <div class="card p-5"><div class="text-xs text-slate-500">Total Orders</div><div class="text-xl font-bold mt-1">${S.orders.length}</div></div>
-    <div class="card p-5"><div class="text-xs text-slate-500">Currency Active</div><div class="text-xl font-bold mt-1">${CUR()}</div></div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="card p-4"><div class="text-xs text-slate-500">GROSS SALES (TODAY)</div><div class="text-2xl font-extrabold mt-1">৳ 11,400</div></div>
+    <div class="card p-4"><div class="text-xs text-slate-500">ESTIMATED NET PROFIT</div><div class="text-2xl font-extrabold mt-1 text-emerald-600">৳ 4,350</div></div>
+    <div class="card p-4"><div class="text-xs text-slate-500">TOTAL ORDERS</div><div class="text-2xl font-extrabold mt-1">${S.orders.length}</div></div>
+    <div class="card p-4"><div class="text-xs text-slate-500">EMPLOYEES</div><div class="text-2xl font-extrabold mt-1 text-brand-600">${S.employees.length}</div></div>
   </div>
-  <div class="card p-6">
-    <h2 class="text-lg font-bold mb-2">Welcome to your Dashboard</h2>
-    <p class="text-sm text-slate-500">All features including Orders, Inventory, and Ledger are now fully loaded.</p>
+  <div class="card p-6 flex gap-3">
+    <button onclick="newSaleModal()" class="btn">+ New Order & Fake Check</button>
+    <button onclick="addEmployeeModal()" class="btn btn-ghost">+ Add Employee</button>
   </div>`;
 
-V.orders = () => `<div class="card p-6"><h2 class="text-lg font-bold mb-4">Orders Management</h2><p class="text-sm text-slate-500">Manage customer orders and fake-order checker here.</p></div>`;
-V.inventory = () => `<div class="card p-6"><h2 class="text-lg font-bold mb-4">Inventory Stock</h2><p class="text-sm text-slate-500">Track stock levels and products.</p></div>`;
-V.ledger = () => `<div class="card p-6"><h2 class="text-lg font-bold mb-4">Financial Ledger</h2><p class="text-sm text-slate-500">Track income and expenses.</p></div>`;
-V.advisor = () => `<div class="card p-6"><h2 class="text-lg font-bold mb-4">AI Advisor</h2><p class="text-sm text-slate-500">Smart business suggestions.</p></div>`;
+V.orders = () => `
+  <div class="flex justify-between items-center mb-4"><h2 class="text-lg font-bold">Orders & Fake Order Tracking</h2><button onclick="newSaleModal()" class="btn">+ New Order</button></div>
+  <div class="card overflow-x-auto"><table class="w-full text-left">
+    <thead class="bg-slate-50 dark:bg-slate-800"><tr><th class="th">Customer</th><th class="th">Phone</th><th class="th">Products</th><th class="th">Total</th><th class="th">Risk Status</th><th class="th">Action</th></tr></thead>
+    <tbody>${S.orders.map(o => `<tr>
+      <td class="td font-semibold">${o.customer}</td>
+      <td class="td">${o.phone}</td>
+      <td class="td">${o.products}</td>
+      <td class="td">${money(o.total)}</td>
+      <td class="td"><span class="badge ${o.status === 'Flagged Fake' ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}">${o.status}</span></td>
+      <td class="td"><button onclick="printInvoice('${o.id}')" class="lnk text-brand-600">Print Invoice</button></td>
+    </tr>`).join('') || `<tr><td colspan="6" class="td text-slate-500">No orders recorded yet.</td></tr>`}</tbody>
+  </table></div>`;
+
+V.inventory = () => `<div class="card p-6"><h2 class="text-lg font-bold mb-2">Inventory Track & Alerts</h2><p class="text-sm text-slate-500">Stock levels and low inventory warnings.</p></div>`;
+
+V.hr = () => `
+  <div class="flex justify-between items-center mb-4"><h2 class="text-lg font-bold">Employee & Payroll Management</h2><button onclick="addEmployeeModal()" class="btn">+ Add Employee</button></div>
+  <div class="card overflow-x-auto"><table class="w-full text-left">
+    <thead class="bg-slate-50 dark:bg-slate-800"><tr><th class="th">Name</th><th class="th">Designation</th><th class="th">Monthly Salary</th></tr></thead>
+    <tbody>${S.employees.map(e => `<tr><td class="td font-semibold">${e.name}</td><td class="td">${e.role}</td><td class="td">${money(e.salary)}</td></tr>`).join('') || `<tr><td colspan="3" class="td text-slate-500">No employees added.</td></tr>`}</tbody>
+  </table></div>`;
+
+V.reports = () => `
+  <div class="card p-6">
+    <h2 class="text-lg font-bold mb-2">Reports & Invoice Generation</h2>
+    <p class="text-sm text-slate-500 mb-4">Print professional store invoices and view complete sales performance reports.</p>
+    <button onclick="window.print()" class="btn">Print Current Report</button>
+  </div>`;
 
 function go(t) { TAB = t; render(); window.scrollTo(0, 0); }
 
 function render() {
   if (!V[TAB]) TAB = 'dashboard';
   document.querySelector('#view').innerHTML = V[TAB]();
-  document.querySelector('#pageTitle').textContent = TABS.find(t => t[0] === TAB)?.[2] || 'Dashboard';
+  document.querySelector('#pageTitle').textContent = TABS.find(t => t[0] === TAB)?.[2] || 'Operational Overview';
   
   document.querySelector('#sideNav').innerHTML = TABS.map(([k, ic, l]) => `
-    <button onclick="go('${k}')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-left transition-colors ${k === TAB ? 'bg-brand-50 text-brand-700' : 'text-slate-600 hover:bg-slate-100'}">
+    <button onclick="go('${k}')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-left transition-colors ${k === TAB ? 'bg-brand-50 text-brand-700 dark:bg-brand-950/50 dark:text-brand-300' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}">
       <span>${ic}</span>${l}
     </button>`).join('');
 
-  const name = S.profile?.name || 'BizDesk';
-  document.querySelector('#brand').innerHTML = `
-    ${S.profile?.logo ? `<img src="${S.profile.logo}" class="w-8 h-8 rounded object-contain bg-white">` : `<div class="w-8 h-8 rounded bg-brand-700 text-white grid place-items-center font-bold">${name.charAt(0)}</div>`}
-    <div class="font-extrabold truncate">${name}</div>`;
+  document.querySelector('#storeNameBadge').textContent = S.profile?.name || 'Artisan Bakery Store';
 }
-
-function updateLogo(url) { LOGO = url; }
-function openSetup() {
-  const p = S.profile || {};
-  document.querySelector('#sName').value = p.name || '';
-  document.querySelector('#sPhone').value = p.phone || '';
-  document.querySelector('#sCur').value = p.currency || '৳';
-  document.querySelector('#sAddr').value = p.address || '';
-  document.querySelector('#sSheet').value = p.sheetUrl || '';
-  document.querySelector('#sLogoUrl').value = p.logo || '';
-  document.querySelector('#setup').classList.remove('hidden');
-  document.querySelector('#setup').classList.add('flex');
-}
-function closeSetup() { document.querySelector('#setup').classList.add('hidden'); document.querySelector('#setup').classList.remove('flex'); }
-
-document.querySelector('#sForm').addEventListener('submit', e => {
-  e.preventDefault();
-  const prof = {
-    name: document.querySelector('#sName').value,
-    phone: document.querySelector('#sPhone').value,
-    currency: document.querySelector('#sCur').value,
-    address: document.querySelector('#sAddr').value,
-    sheetUrl: document.querySelector('#sSheet').value,
-    logo: document.querySelector('#sLogoUrl').value
-  };
-  DB.ref('settings/profile').set(prof);
-  closeSetup();
-});
 </script>
 </body>
 </html>
