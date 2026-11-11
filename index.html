@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><!DOCTYPE html>
-<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -28,7 +26,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<!-- Firebase SDKs (Auth, App, Database) -->
+<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
@@ -39,9 +37,6 @@
     .btn { @apply inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-semibold bg-brand-700 text-white hover:bg-brand-600 transition-colors whitespace-nowrap; }
     .btn-ghost { @apply bg-transparent text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800; }
     .inp { @apply w-full min-w-0 px-3 py-2 rounded-lg text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500; }
-    .th { @apply text-left px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap; }
-    .td { @apply px-4 py-3 text-sm align-middle border-t border-slate-100 dark:border-slate-800 whitespace-nowrap; }
-    .badge { @apply inline-block px-2 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap; }
   }
   body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
 </style>
@@ -57,7 +52,7 @@
   </div>
 </div>
 
-<!-- Google Login Screen (Hidden if logged in) -->
+<!-- Google Login Screen -->
 <div id="loginScreen" class="fixed inset-0 z-[75] hidden grid place-items-center bg-slate-900/80 p-4">
   <div class="card max-w-md w-full p-8 text-center shadow-2xl bg-white dark:bg-slate-900">
     <div class="w-12 h-12 rounded-xl bg-brand-700 text-white grid place-items-center font-extrabold text-xl mx-auto mb-4">B</div>
@@ -91,7 +86,7 @@
   </div>
 </div>
 
-<!-- Business Setup / Profile Modal with Logo & Currency -->
+<!-- Business Setup Modal -->
 <div id="setup" class="fixed inset-0 z-[70] hidden items-center justify-center bg-slate-900/70 p-4">
   <form id="sForm" class="card w-full max-w-lg p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
     <h2 class="font-extrabold text-xl mb-4">Business Profile & Settings</h2>
@@ -117,7 +112,7 @@
       <label class="block text-xs font-semibold text-slate-500">Google Sheets Web App URL (Optional Backup)
         <input id="sSheet" type="url" class="inp mt-1" placeholder="https://script.google.com/macros/s/.../exec"></label>
       <div>
-        <span class="text-xs font-semibold text-slate-500">Logo URL or Upload</span>
+        <span class="text-xs font-semibold text-slate-500">Logo URL</span>
         <div class="flex items-center gap-3 mt-1">
           <div class="w-14 h-14 shrink-0 rounded-lg border border-dashed grid place-items-center overflow-hidden bg-slate-50">
             <img id="sPrev" alt="" class="max-w-full max-h-full object-contain hidden">
@@ -151,66 +146,56 @@ try {
   firebase.initializeApp(FIREBASE_CONFIG);
   DB = firebase.database();
   AUTH = firebase.auth();
-} catch(
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>BizDesk – Business Operating System</title>
-<meta name="theme-color" content="#0f766e">
+} catch(e) { console.error(e); }
 
-<script>
-  (function () {
-    try { if (localStorage.getItem('bizdesk_theme') === 'dark') document.documentElement.classList.add('dark'); } catch (e) {}
-  })();
-</script>
-<script src="https://cdn.tailwindcss.com/3.4.17"></script>
-<script>
-  tailwind.config = {
-    darkMode: 'class',
-    theme: {
-      extend: {
-        fontFamily: { sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'] },
-        colors: { brand: { 50: '#f0fdfa', 100: '#ccfbf1', 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e', 900: '#134e4a' } }
-      }
-    }
-  };
-</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+let S = { profile: null };
+let LOGO = '';
 
-<!-- Firebase SDKs (Auth, App, Database) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+function loginWithGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  AUTH.signInWithPopup(provider).catch(err => alert(err.message));
+}
 
-<style type="text/tailwindcss">
-  @layer components {
-    .card { @apply bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl min-w-0; }
-    .btn { @apply inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-semibold bg-brand-700 text-white hover:bg-brand-600 transition-colors whitespace-nowrap; }
-    .btn-ghost { @apply bg-transparent text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800; }
-    .inp { @apply w-full min-w-0 px-3 py-2 rounded-lg text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500; }
-    .th { @apply text-left px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap; }
-    .td { @apply px-4 py-3 text-sm align-middle border-t border-slate-100 dark:border-slate-800 whitespace-nowrap; }
-    .badge { @apply inline-block px-2 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap; }
+function logout() {
+  AUTH.signOut();
+}
+
+// Fixed auth state observer with safety timeout
+let loadedOnce = false;
+AUTH.onAuthStateChanged(user => {
+  loadedOnce = true;
+  const boot = document.querySelector('#boot');
+  if (boot) boot.remove();
+
+  if (user) {
+    document.querySelector('#loginScreen').classList.add('hidden');
+    startFirebaseData();
+  } else {
+    document.querySelector('#loginScreen').classList.remove('hidden');
   }
-  body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
-</style>
-</head>
+});
 
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 antialiased transition-colors">
+// Fallback safety if auth takes too long
+setTimeout(() => {
+  if (!loadedOnce) {
+    const boot = document.querySelector('#boot');
+    if (boot) boot.remove();
+    document.querySelector('#loginScreen').classList.remove('hidden');
+  }
+}, 4000);
 
-<!-- Boot Screen -->
-<div id="boot" class="fixed inset-0 z-[80] grid place-items-center bg-slate-50 dark:bg-slate-950">
-  <div class="text-center">
-    <div class="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-    <p class="mt-4 text-sm text-slate-500">Loading BizDesk OS…</p>
-  </div>
-</div>
+function startFirebaseData() {
+  DB.ref('settings/profile').on('value', snap => {
+    S.profile = snap.val();
+    render();
+    if (!S.profile) openSetup();
+  });
+}
 
-<!-- Google Login Screen (Hidden if logged in) -->
-<div id="loginScreen" class="fixed inset-0 z-[75] hidden grid place-items-center bg-slate-900/80 p-4">
-  <div class="card max-w-md w-full p-8 text-center shadow-2xl bg-white dark:bg-slate-900">
-    <div class="w-12 h-12 rounded-xl bg-brand-700 text-white grid place-items-center font-extrabold text-xl mx-auto mb-4">B</div>
-    <h2 class="text-2xl font-extrabold mb-2">Welcome to BizDesk</h2>
-    <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Sign in with your Google account to access your business operating system.</p>
-    <button onclick="loginWithGoogle()" class="btn w-full py-3 gap-3 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 dark:bg-slate-800 dark:text-white dark:border-slate-700 font-bold">
-      <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.16 21.32 7.22 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.83 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0
+const CUR = () => (S.profile && S.profile.currency) || '৳';
+
+function render() {
+  const name = S.profile?.name || 'BizDesk';
+  document.querySelector('#view').innerHTML = `
+    <div class="grid sm:grid-cols-3 gap-4 mb-6">
+      <div class="card p-5"><div class="text-xs text-slate-500">Business Name</div><div class="text-
